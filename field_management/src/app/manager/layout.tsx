@@ -8,9 +8,9 @@ import Footer from "@/components/customer/footer/footer";
 function CustomerLayOut({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Header></Header>
+      {/* <Header></Header> */}
       <main>{children}</main>
-      <Footer></Footer>
+      {/* <Footer></Footer> */}
     </>
   );
 }

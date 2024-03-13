@@ -4,15 +4,16 @@ import { Field } from "@/types/interfaces/field";
 import { loginData } from "@/types/interfaces/auth";
 import { Login } from "../../utils/auth";
 
-import { useEffect, useState } from "react";
-import { redirect } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 // A Manager Page which help admin manage, observe data from web.
 function ManagerHome() {
+  const { push } = useRouter();
   // const session = await getSession
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [acc, setAcc] = useState<any>();
+  const [acc, setAcc] = useState<boolean>();
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -21,13 +22,16 @@ function ManagerHome() {
       password: password,
     };
 
-    setAcc(await Login(formLogin));
+    //Redirect to
+    if ((await Login(formLogin)) === true) {
+      push("/manager/manage");
+    }
   }
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        123123 <br />
+        <br />
         <label htmlFor="username">Username: </label>
         <input
           id="username"
@@ -49,7 +53,6 @@ function ManagerHome() {
         />
         <button type="submit">Check</button>
       </form>
-      {/* {acc[0].username && <h1>{acc[0].username}</h1>} */}
     </div>
   );
 }

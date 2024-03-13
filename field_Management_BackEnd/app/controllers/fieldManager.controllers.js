@@ -1,5 +1,6 @@
 const {FieldManager} = require("../model/model");
 
+const { setCookie } = require("cookies-next");
 const FieldManagerController = {
     addFieldManager: async (req,res) => {
         try{
@@ -36,28 +37,29 @@ const FieldManagerController = {
 
     checkAuth: async (req, res) => {
         console.log(req.body);
-        try {
+        // try {
             const {username, password} = req.body;
         if(username && password){
             const acc = await FieldManager.find({
                 username: username,
                 password: password,
             })
-            const expires = new Date(Date.now() + 10 * 1000);
+
+            // Check if FieldManager exist
+            if(Object.keys(acc).length !== 0){
             const userString = JSON.stringify(acc[0]);
-            res.setHeader(
-                "Set-Cookie",
-                `userData=${encodeURIComponent(userString)}; Expires=${expires.toUTCString()}; Path=/; HttpOnly`,
-              );
+            setCookie('userData', userString, { req, res, maxAge: 60 * 6 * 24 })
+            
+            }
             res.status(200).json(acc);
             
         }
         else {
             res.status(200).json([]);
         }
-        } catch (error) {
-         res.status(500).json(error);
-        }
+        // } catch (error) {
+        //  res.status(500).json(error);
+        // }
     }
 }
 
