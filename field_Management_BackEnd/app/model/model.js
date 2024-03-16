@@ -15,6 +15,72 @@ const address = new mongoose.Schema({
         type: String, 
         required: true
     },
+});
+
+const TimeSlotSchema = new mongoose.Schema({
+    customerName: {
+        type: String,
+    },
+    startTime: {
+        type:String,
+        required: true,
+    },
+    endTime: {
+        type:String,
+        required: true,
+    },
+    available: {
+        type: Boolean,
+        default: true,
+    },
+});
+
+const ChildFieldSchema = new mongoose.Schema({
+    name: {
+        type:String,
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    
+    field: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Field",
+        required: true,
+    },
+
+    schedule: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Schedule",
+        },
+    ],
+    
+});
+
+
+
+const ScheduleSchema = new mongoose.Schema({
+    date: {
+        type:String,
+        required: true,
+    },
+
+    childField: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ChildField",
+        required: true,
+    },
+    
+    timeSlot :[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'TimeSlot'
+        }
+    ]
+    
 })
 
 const fieldSchema = new mongoose.Schema({
@@ -28,19 +94,28 @@ const fieldSchema = new mongoose.Schema({
         type: address, 
     },
 
-    priceFrom: {
-        type: Number,
-        min: 0,
+    startWorkAt: {
+        type: String,
+        required: true,
     },
 
-    priceTo: {
-        type: Number,
-        min: 0,
+    endWorkAt: {
+        type: String,
+        required: true,
     },
 
     ownerPhoneNumber: {
-        type: String
+        type: String,
+        required: true
     },
+
+    
+    childField: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ChildField",
+        }
+    ],
 
     rating: {
         type: Number,
@@ -188,4 +263,8 @@ let FieldAccounts = mongoose.model("FieldAccounts", FieldAccountsSchema);
 let Customer = mongoose.model("Customer", customerSchema);
 let Rating = mongoose.model("Rating", RatingSchema);
 
-module.exports = { Field, Sport, FieldManager, FieldAccounts , Customer, Rating};
+let ChildField = mongoose.model("ChildField", ChildFieldSchema);
+let Schedule = mongoose.model("Schedule", ScheduleSchema);
+let TimeSlot = mongoose.model("TimeSlot", TimeSlotSchema);
+
+module.exports = { Field, Sport, FieldManager, FieldAccounts , Customer, Rating, ChildField, Schedule, TimeSlot};

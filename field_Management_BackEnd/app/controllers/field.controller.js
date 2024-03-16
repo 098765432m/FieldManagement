@@ -1,6 +1,6 @@
 const {Field, Sport, FieldManager, FieldAccounts} = require("../model/model");
 
-const {deleteAllAccountsByFieldID} = require ("../utils/helpers.util.tsx");
+const {deleteAllAccountsByFieldID} = require ("../utils/helpers.util.js");
 
 const FieldController = {
     addField: async (req,res) => {

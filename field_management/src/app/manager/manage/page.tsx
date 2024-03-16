@@ -1,39 +1,31 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getCookie, getCookies, hasCookie } from "cookies-next";
+import Conditional from "@/components/Conditional";
+import { getCookie, hasCookie } from "cookies-next";
 
 function ManageField() {
-  const { push } = useRouter();
-
-  const [check, setCheck] = useState(false);
-
-  function checkCookie() {
-    if (hasCookie("userData")) {
-      setCheck(true);
-      return true;
-    } else {
-      setCheck(false);
-      return false;
-    }
-  }
+  const [userExist, setUserExist] = useState(false);
+  const [userObject, setUserObject] = useState<any>({});
 
   useEffect(() => {
-    if (checkCookie() === true) {
-      console.log(true);
-    } else {
-      console.log(false);
-      push("/manager");
+    if (hasCookie("userData")) {
+      setUserExist(true);
+      const cookie = getCookie("userData");
+      if (typeof cookie === "string") {
+        setUserObject(JSON.parse(cookie));
+      }
     }
   }, []);
   return (
     <div>
-      <button className="border-4" onClick={() => checkCookie()}>
-        Check
-      </button>
-      {check && <h1>Dep traiu</h1>}
+      <Conditional showWhen={userExist}>
+        <h1>welcome</h1>
+        <h2>{userObject._id}</h2>
+        <h2>{userObject.username}</h2>
+        <h2>{userObject.email}</h2>
+      </Conditional>
     </div>
   );
 }

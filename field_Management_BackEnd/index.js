@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const app = express();
 const morgan = require('morgan');
-const mongoose = require("mongoose");
 
 //Api Error
 
@@ -14,8 +12,11 @@ const ApiError = require("./app/api-error");
 const fieldsRouter = require("./app/routes/field.routes");
 const sportsRouter = require("./app/routes/sport.routes");
 const fieldManagerRouter = require("./app/routes/fieldManager.routes");
+const fieldAccountsRouter = require("./app/routes/fieldAccounts.routes");
 const customerRouter = require("./app/routes/customer.routes");
 const ratingRouter = require("./app/routes/rating.routes");
+const scheduleRouter = require("./app/routes/schedule.routes");
+const childFieldRouter = require("./app/routes/childField.routes");
 
 app.use(cors());
 app.use(express.json());
@@ -31,8 +32,12 @@ app.get("/", (req, res) => {
 app.use("/api/fields", fieldsRouter);
 app.use("/api/sports", sportsRouter);
 app.use("/api/owners", fieldManagerRouter);
+app.use("/api/accounts", fieldAccountsRouter);
 app.use("/api/customers", customerRouter);
 app.use("/api/rating", ratingRouter);
+app.use("/api/Schedule", scheduleRouter);
+app.use("/api/ChildField", childFieldRouter);
+
 //Lỗi 404
 app.use((req,res,next) => {
     return next(new ApiError(404, "Không tìm thấy trang"));

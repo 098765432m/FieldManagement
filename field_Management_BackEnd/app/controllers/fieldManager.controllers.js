@@ -48,6 +48,7 @@ const FieldManagerController = {
             // Check if FieldManager exist
             if(Object.keys(acc).length !== 0){
             const userString = JSON.stringify(acc[0]);
+            // set cookie co ten la 'userData' voi tui tho la 60 * 6 * 24 giay
             setCookie('userData', userString, { req, res, maxAge: 60 * 6 * 24 })
             
             }

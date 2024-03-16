@@ -1,14 +1,12 @@
 //Customer Layout
 
 import React from "react";
-
-import Header from "@/components/customer/header/header";
-import Footer from "@/components/customer/footer/footer";
+import ManagerHeader from "@/components/manager/ManagerHeader";
 
 function CustomerLayOut({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* <Header></Header> */}
+      <ManagerHeader></ManagerHeader>
       <main>{children}</main>
       {/* <Footer></Footer> */}
     </>
