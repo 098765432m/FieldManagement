@@ -17,6 +17,7 @@ const customerRouter = require("./app/routes/customer.routes");
 const ratingRouter = require("./app/routes/rating.routes");
 const scheduleRouter = require("./app/routes/schedule.routes");
 const childFieldRouter = require("./app/routes/childField.routes");
+const timeSlotRouter = require('./app/routes/timeSlot.routes');
 
 app.use(cors());
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use("/api/customers", customerRouter);
 app.use("/api/rating", ratingRouter);
 app.use("/api/Schedule", scheduleRouter);
 app.use("/api/ChildField", childFieldRouter);
+app.use("/api/TimeSlot", timeSlotRouter);
 
 //Lỗi 404
 app.use((req,res,next) => {
@@ -49,5 +51,14 @@ app.use((err,req,res,next) => {
         message: err.message || "Lỗi hệ thống",
     });
 });
+
+// const moment = require('moment');
+// const st = moment('12:30', 'HH:mm');
+// const et = moment('23:30', 'HH:mm');
+// console.log(st.format('HH:mm'));
+// console.log(et.format('HH:mm'));
+// const isValid = st.isBefore(et);
+// console.log(isValid);
+
 
 module.exports = app;

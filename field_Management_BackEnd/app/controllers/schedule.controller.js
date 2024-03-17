@@ -1,4 +1,4 @@
-const {Schedule, ChildField} = require("../model/model");
+const {Schedule, Field} = require("../model/model");
 const moment  = require('moment');
 
 const ScheduleController = {
@@ -27,23 +27,21 @@ const ScheduleController = {
             //check date data is correct formar or valid
             ScheduleController.checkDateIsValid(dateString);
 
-            const childField_ID = req.body.childField;
-            const doc_ChildField = await ChildField.findById(childField_ID);
-            if (doc_ChildField) {
+            const field_ID = req.body.field;
+            const doc_Field = await Field.findById(field_ID);
+
+            //check Field is found ?
+            if (doc_Field) {
                 const newSchedule = new Schedule(req.body);
                 const savedSchedule = await newSchedule.save();
 
-                //Update Schedule trong ChildField
-                await doc_ChildField.updateOne({
-                    $push: { schedule: savedSchedule._id}
-                })
-                res.status(200).json(savedSchedule);                
+                return res.status(200).json(savedSchedule);                
             } else {
-                return res.status(400).json({error: `khong tim thay Child Field voi id = ` + childField_ID});
+                return res.status(400).json({error: `khong tim thay Field voi id = ` + field_ID});
             }
         }catch(err){
             const statusCode = err.statusCode || 500;
-            res.status(statusCode).json({err : err.message});
+            return res.status(statusCode).json({err : err.message});
         }
     },
 
@@ -52,9 +50,9 @@ const ScheduleController = {
         const id = req.params.id
         const schedule = await Schedule.findById(id);
         if (schedule) {
-        res.status(200).json(schedule);   
+          return res.status(200).json(schedule);   
         } else {
-            res.status(400).json({error: `khong tim thay Schedule voi id = ` + id});
+          return res.status(400).json({error: `khong tim thay Schedule voi id = ` + id});
         }
     },
 
@@ -80,9 +78,9 @@ const ScheduleController = {
       //Kiểm xem có tìm thấy schedule không
       if(schedule){
           await schedule.updateOne(req.body);
-          res.status(200).json("Updated successfully");
+          return res.status(200).json("Updated successfully");
       } else {
-        res.status(400).json({error: 'Khong tim thay lich voi id' + id})
+        return res.status(400).json({error: 'Khong tim thay lich voi id' + id})
       }
 
     } catch (err) {
@@ -98,19 +96,16 @@ const ScheduleController = {
       const schedule  = await Schedule.findById(id);
 
       if(schedule){
-        //Xoa Id luu trong Field
-        await ChildField.updateOne(
-          {_id: schedule.childField},
-          {$pull: {schedule: id}}
-        )
+        //Lam xoa cac TimeSlot cua schedule nay
+        
         await schedule.deleteOne();
 
-        res.status(200).json(`Deleted a Schedule`);
+        return res.status(200).json(`Deleted a Schedule`);
       } else {
-        res.status(400).json({error: `Khong tim thay Schedule voi id = ` + id});
+        return res.status(400).json({error: `Khong tim thay Schedule voi id = ` + id});
       }
     } catch (err) {
-      res.status(500).json(err);
+      return res.status(500).json(err);
     }
   },
 }

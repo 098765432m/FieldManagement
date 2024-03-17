@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const ScheduleController = require("../controllers/schedule.controller");
-const { Schedule } = require("../model/model");
+
 
 router.route("/")
     //add 1 Schedule

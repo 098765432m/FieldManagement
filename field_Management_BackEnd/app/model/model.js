@@ -29,6 +29,19 @@ const TimeSlotSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
+
+    childField: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ChildField",
+        required: true,
+    },
+
+    schedule: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SChedule",
+        required: true,
+    },
+
     available: {
         type: Boolean,
         default: true,
@@ -50,13 +63,6 @@ const ChildFieldSchema = new mongoose.Schema({
         ref: "Field",
         required: true,
     },
-
-    schedule: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Schedule",
-        },
-    ],
     
 });
 
@@ -67,10 +73,10 @@ const ScheduleSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
-
-    childField: {
+    
+    field: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ChildField",
+        ref: "Field",
         required: true,
     },
     
