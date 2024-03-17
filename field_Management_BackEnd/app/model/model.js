@@ -90,14 +90,24 @@ const ScheduleSchema = new mongoose.Schema({
 })
 
 const fieldSchema = new mongoose.Schema({
+    //fieldName
+    //fieldAddress
+    //startWorkAt
+    //endWorkAt
+    //ownerPhoneNumber
+    //childField
+    //rating
+    //Sport
+
     fieldName: {
         type: String,
         required: true,
-        min: [4, "At least 4 characters, got {VALUE}"]
+        minlength: [4, "At least 4 characters, got {VALUE}"]
     },
 
     fieldAddress: {
-        type: address, 
+        type: address,
+        required: true
     },
 
     startWorkAt: {
@@ -110,11 +120,11 @@ const fieldSchema = new mongoose.Schema({
         required: true,
     },
 
-    ownerPhoneNumber: {
-        type: String,
-        required: true
+    fieldAccounts: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FieldAccounts",
+        required: true,
     },
-
     
     childField: [
         {
@@ -130,12 +140,11 @@ const fieldSchema = new mongoose.Schema({
         max: [5, "Rating is too high, got {VALUE}"]
     },
 
-    sport: 
-        {
+    sport: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Sport",
             required: true
-        },
+    },
 });
 
 //Field's Manager Accounts
@@ -151,7 +160,8 @@ const FieldAccountsSchema = mongoose.Schema({
 
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "FieldManager"
+        ref: "FieldManager",
+        required: true
     },
 
     staff: [
@@ -190,15 +200,17 @@ const fieldManagerSchema = mongoose.Schema({
 
     password:{
         type: String,
-        required: true,
+        default: '123',
     },
 
     email: {
         type: String,
+        required: true
     },
 
     phoneNumber: {
         type: String,
+        required: true
     },
 
     role: {

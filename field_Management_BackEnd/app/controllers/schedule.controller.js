@@ -1,17 +1,9 @@
-const {Schedule, Field} = require("../model/model");
+const {Schedule, Field, TimeSlot} = require("../model/model");
 const moment  = require('moment');
 
-const ScheduleController = {
+const { ErrorHandler } = require('../utils/errorHandler.util');
 
-    //Function that check time (DD-MM-YYYY)
-    checkDateIsValid : (dateString) => {
-        const date = moment(dateString, "DD-MM-YYYY");
-        if(!date.isValid()){
-            const error = new Error(`Du lieu date: ${dateString} khong hop le - DD-MM-YYYY`);
-            error.statusCode = 400;
-            throw error;
-        }
-    },
+const ScheduleController = {
 
     // add Schedule
     addSchedule: async (req,res) => {
@@ -25,7 +17,7 @@ const ScheduleController = {
 
             const dateString = req.body.date;
             //check date data is correct formar or valid
-            ScheduleController.checkDateIsValid(dateString);
+            ErrorHandler.checkDateIsValid(dateString);
 
             const field_ID = req.body.field;
             const doc_Field = await Field.findById(field_ID);
@@ -68,7 +60,7 @@ const ScheduleController = {
 
       //check date data is correct formar or valid
       const dateString = req.body.date;
-      ScheduleController.checkDateIsValid(dateString);
+      ErrorHandler.checkDateIsValid(dateString);
 
       //get params id
       const id = req.params.id;
@@ -93,19 +85,35 @@ const ScheduleController = {
   deleteASchedule: async (req, res) => {
     try {
       const id = req.params.id;
-      const schedule  = await Schedule.findById(id);
+      const schedule  = await Schedule.findById(id).populate('timeSlot');
 
-      if(schedule){
-        //Lam xoa cac TimeSlot cua schedule nay
-        
+      if(!schedule){
+        return res.status(400).json({error: `Khong tim thay Schedule voi id = ` + id});
+      }
+
+      //Check if This Schedule has any TimeSlots
+      if(schedule.timeSlot.length != 0){
+        //check if Any TimeSlot that going to delete is booked
+        const TimeSlots = await TimeSlot.find({schedule: id, available: false});
+        console.log(TimeSlots);
+        if(TimeSlots.length !== 0){
+          return res.status(400).json({error: `At least A TimeSlot is booked, you can't delete this Schedule`});
+        }
+
+        //Delete Any TimeSlots this Schedule have
+        await TimeSlot.deleteMany({
+          schedule: id
+        });
+      }
+
+        //Delete this SChedule
         await schedule.deleteOne();
 
         return res.status(200).json(`Deleted a Schedule`);
-      } else {
-        return res.status(400).json({error: `Khong tim thay Schedule voi id = ` + id});
-      }
+      
     } catch (err) {
-      return res.status(500).json(err);
+      const statusCode = err.statusCode || 500;
+      return res.status(statusCode).json({err: err.message});
     }
   },
 }

@@ -11,11 +11,16 @@ router.route("/")
 router.route("/checkAuth")
     .post(FieldManagerController.checkAuth);
 
+router.route("/staff/:id")
+    .delete(FieldManagerController.deleteAStaff);
+
+router.route("/owner/:id")
+    .delete(FieldManagerController.deleteAnOwner);
+
 router.route("/:id")
     //Lấy 1 manager dựa id
     .get(FieldManagerController.getAnManager)
     // Xóa 1 manager dựa id
-    .delete(FieldManagerController.deleteAManager);
 
 
 module.exports = router;

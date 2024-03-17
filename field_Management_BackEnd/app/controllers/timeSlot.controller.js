@@ -1,34 +1,14 @@
 const {TimeSlot, ChildField, Schedule} = require("../model/model");
+
+const {ErrorHandler} = require('../utils/errorHandler.util');
+
 const moment  = require('moment');
 
 const TimeSlotController = {
 
-    //Function that check time (HH:mm)
-    checkTimeIsValid : (timeString) => {
-        const time = moment(timeString, "HH:mm");
-        if(!time.isValid()){
-            const error = new Error(`Du lieu time: ${timeString} khong hop le - HH:mm`);
-            error.statusCode = 400;
-            throw error;
-        }
-    },
-
-    // check if startTime > endTime
-    checkTimeIsBefore : (startTime, endTime) => {
-      const st = moment(startTime, "HH:mm");
-      const et = moment(endTime, "HH:mm");
-
-      if(st.isAfter(et)){
-        const error = new Error(`The startTime: ${startTime} is before the endTime: ${endTime}`);
-        error.statusCode = 400;
-        throw error;
-      }
-    },
-
     // add TimeSlot
     addTimeSlot: async (req,res) => {
         try{
-
             const validationError = new TimeSlot(req.body).validateSync();
             // Check req.body
             if(validationError){
@@ -39,11 +19,11 @@ const TimeSlotController = {
             const endTimeString = req.body.endTime;
 
             //check Start and End Time Data is correct format or valid
-            TimeSlotController.checkTimeIsValid(startTimeString);
-            TimeSlotController.checkTimeIsValid(endTimeString);
+            ErrorHandler.checkTimeIsValid(startTimeString);
+            ErrorHandler.checkTimeIsValid(endTimeString);
             
-            TimeSlotController.checkTimeIsBefore(startTimeString, endTimeString);
-
+            ErrorHandler.checkTimeIsAfter(startTimeString, endTimeString);
+            
             const childField_ID = req.body.childField;
             const doc_ChildField = await ChildField.findById(childField_ID);
 

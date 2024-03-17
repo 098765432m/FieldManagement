@@ -30,12 +30,13 @@ app.get("/", (req, res) => {
 });
 
 //Truyền Route
-app.use("/api/fields", fieldsRouter);
+app.use("/api/Field", fieldsRouter);
 app.use("/api/sports", sportsRouter);
-app.use("/api/owners", fieldManagerRouter);
+app.use("/api/FieldManager", fieldManagerRouter);
 app.use("/api/accounts", fieldAccountsRouter);
 app.use("/api/customers", customerRouter);
 app.use("/api/rating", ratingRouter);
+
 app.use("/api/Schedule", scheduleRouter);
 app.use("/api/ChildField", childFieldRouter);
 app.use("/api/TimeSlot", timeSlotRouter);
@@ -57,7 +58,7 @@ app.use((err,req,res,next) => {
 // const et = moment('23:30', 'HH:mm');
 // console.log(st.format('HH:mm'));
 // console.log(et.format('HH:mm'));
-// const isValid = st.isBefore(et);
+// const isValid = st.isValid();
 // console.log(isValid);
 
 
