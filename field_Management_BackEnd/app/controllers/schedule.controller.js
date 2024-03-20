@@ -1,5 +1,7 @@
-const {Schedule, Field, TimeSlot} = require("../model/model");
+const {Schedule, Field, TimeSlot, ChildField} = require("../model/model");
 const moment  = require('moment');
+
+const TimeSlotController = require('./timeSlot.controller');
 
 const { ErrorHandler } = require('../utils/errorHandler.util');
 
@@ -20,17 +22,34 @@ const ScheduleController = {
             ErrorHandler.checkDateIsValid(dateString);
 
             const field_ID = req.body.field;
-            const doc_Field = await Field.findById(field_ID);
+            const doc_Field = await Field.findById(field_ID).populate('startWorkAt').populate('endWorkAt');
 
             //check Field is found ?
-            if (doc_Field) {
-                const newSchedule = new Schedule(req.body);
-                const savedSchedule = await newSchedule.save();
-
-                return res.status(200).json(savedSchedule);                
-            } else {
+            if (!doc_Field) {
                 return res.status(400).json({error: `khong tim thay Field voi id = ` + field_ID});
             }
+
+            const {startWorkAt, endWorkAt, duration, childField} = doc_Field;
+            ErrorHandler.checkTimeIsValid(startWorkAt);
+            ErrorHandler.checkTimeIsValid(endWorkAt);
+            ErrorHandler.checkTimeIsValid(duration);
+
+            console.log(childField);
+
+            //Add a Schedule
+            const newSchedule = new Schedule(req.body);
+            const savedSchedule = await newSchedule.save();
+
+            //Add Many TimeSlot
+            await TimeSlotController.addManyTimeSlot(childField,
+              savedSchedule._id,
+              startWorkAt,
+              endWorkAt,
+              duration
+            );
+            
+            return res.status(200).json(savedSchedule);      
+            
         }catch(err){
             const statusCode = err.statusCode || 500;
             return res.status(statusCode).json({err : err.message});
@@ -85,7 +104,7 @@ const ScheduleController = {
   deleteASchedule: async (req, res) => {
     try {
       const id = req.params.id;
-      const schedule  = await Schedule.findById(id).populate('timeSlot');
+      const schedule  = await Schedule.findById(id);
 
       if(!schedule){
         return res.status(400).json({error: `Khong tim thay Schedule voi id = ` + id});
@@ -95,7 +114,6 @@ const ScheduleController = {
       if(schedule.timeSlot.length != 0){
         //check if Any TimeSlot that going to delete is booked
         const TimeSlots = await TimeSlot.find({schedule: id, available: false});
-        console.log(TimeSlots);
         if(TimeSlots.length !== 0){
           return res.status(400).json({error: `At least A TimeSlot is booked, you can't delete this Schedule`});
         }

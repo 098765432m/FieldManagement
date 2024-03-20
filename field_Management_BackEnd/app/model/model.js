@@ -38,7 +38,7 @@ const TimeSlotSchema = new mongoose.Schema({
 
     schedule: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "SChedule",
+        ref: "Schedule",
         required: true,
     },
 
@@ -116,6 +116,11 @@ const fieldSchema = new mongoose.Schema({
     },
 
     endWorkAt: {
+        type: String,
+        required: true,
+    },
+
+    duration: {
         type: String,
         required: true,
     },

@@ -1,13 +1,14 @@
 const {TimeSlot, ChildField, Schedule} = require("../model/model");
 
 const {ErrorHandler} = require('../utils/errorHandler.util');
+const {splitTime, toTime, toDuration} = require("../utils/helpers.util");
 
 const moment  = require('moment');
 
 const TimeSlotController = {
 
     // add TimeSlot
-    addTimeSlot: async (req,res) => {
+    addTimeSlot: async (req, res) => {
         try{
             const validationError = new TimeSlot(req.body).validateSync();
             // Check req.body
@@ -52,6 +53,84 @@ const TimeSlotController = {
 
             const statusCode = err.statusCode || 500;
             return res.status(statusCode).json({err: err.message});
+        }
+    },
+
+    //Create Many TimeSlots within 
+    addManyTimeSlot: async (childField, schedule, startWorkAt, endWorkAt, duration) => {
+      try {
+
+        // Check if ChildField and Schedule exist
+        if(childField.length === 0){
+          const error = new Error('Field does not have any childFields');
+          error.statusCode = 400; // Set the status code
+          throw error;
+        }
+          
+
+        if(schedule === undefined){
+          const error = new Error('Schedule are undefined');
+          error.statusCode = 400; // Set the status code
+          throw error;
+        }
+
+        const doc_Schedule = await Schedule.findById(schedule);
+
+        if(!doc_Schedule){
+          const error = new Error('Schedule has not been found');
+          error.statusCode = 400; // Set the status code
+          throw error;
+        }
+
+        let query = {
+          schedule: schedule,
+        }
+
+        //Get Work time to create TimeSlot
+        
+        ErrorHandler.checkTimeIsValid(startWorkAt);
+        ErrorHandler.checkTimeIsValid(endWorkAt);
+        ErrorHandler.checkTimeIsAfter(startWorkAt, endWorkAt);
+
+        startWorkAt = toTime(startWorkAt);
+        endWorkAt = toTime(endWorkAt);
+        duration = toDuration(duration);
+
+        //Get divide work time into chunks of TimeSlot
+        const timeChunk = splitTime(startWorkAt, endWorkAt, duration);
+
+        //Create Many time TimeSlot for each childField
+        const promises = childField.map( async (childField_ID) => {
+          query[`childField`] = childField_ID;
+
+          //Create A TimeSlot for each time chunk
+          const timeSlotPromises = timeChunk.map( async ({startTime, endTime}) => {
+            query[`startTime`] = startTime;
+            query[`endTime`] = endTime;
+            console.log(query);
+  
+            //Add a TimeSlot
+            const newTimeSlot = new TimeSlot(query);
+            const savedTimeSlot = await newTimeSlot.save();
+  
+            //Then update timeSlot on Schedule
+            await doc_Schedule.updateOne({
+              $push: {timeSlot: savedTimeSlot._id}
+            })
+          });
+
+          return Promise.all(timeSlotPromises);
+        })
+
+        await Promise.all(promises);
+
+        return timeChunk;
+
+        } catch (err) {
+          const statusCode = err.statusCode || 500;
+          const error = new Error(err.message);
+          error.statusCode = statusCode;
+          throw error;
         }
     },
 

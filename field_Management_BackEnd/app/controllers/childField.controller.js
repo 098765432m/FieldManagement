@@ -14,21 +14,21 @@ const ChildFieldController = {
         return res.status(400).json({ error: validationError.message });
       }
       const fieldID = req.body.field;
-      const document = await Field.findById(fieldID);
-      if(document){
+      const doc_Field = await Field.findById(fieldID);
+      if(doc_Field){
         
       const newChildField = new ChildField(req.body);
       const savedChildField = await newChildField.save();
-
       //Update ChildField cho Field
-        await Field.updateOne({$push: {childField: savedChildField._id}})
+        await doc_Field.updateOne({$push: {childField: savedChildField._id}})
 
-      res.status(200).json(savedChildField);
+       return res.status(200).json(savedChildField);
       } else {
-        res.status(400).json({error: `Khong tim thay Field voi id = ` + fieldID});
+        return res.status(400).json({error: `Khong tim thay Field voi id = ` + fieldID});
       }
     } catch (err) {
-      res.status(500).json(err);
+     const statusCode = err.statusCode || 500;
+     return res.status(statusCode).json({err: err.message});
     }
   },
 

@@ -1,4 +1,5 @@
 const { FieldManager, FieldAccounts } = require("../model/model");
+const {ErrorHandler}  = require("./errorHandler.util");
 
 async function deleteAllAccountsByFieldID(field_id) {
   const accounts = await FieldAccounts.find({ field: { _id: field_id } })
@@ -17,20 +18,34 @@ async function deleteAllAccountsByFieldID(field_id) {
   await FieldAccounts.deleteOne({ field: { _id: field_id } });
 }
 
+//Convert String HH:mm to Time
+function toTime(timeString){
+  try {
+    ErrorHandler.checkTimeIsValid(timeString);
+    return moment(timeString, 'HH:mm');
+  } catch (err) {
+    console.log({err: err.message});
+  }
+}
+
+function toDuration(durationString){
+  return moment.duration(durationString).asMinutes();
+}
+
 // Actual logic
 // import moment package
 const moment = require("moment");
 const splitTime = (startTime, endTime, interval) => {
-  const result = [startTime.toString()];
+  const result = [startTime.format('HH:mm')];
   let time = startTime.add(interval, "m");
   while (time.isBetween(startTime, endTime, undefined, [])) {
-    result.push(time.toString());
+    result.push(time.format('HH:mm'));
     time = time.add(interval, "m");
   }
 
   let timeChunk = [];
   for (let i = 0; i < result.length - 1; i++) {
-    timeChunk.push(result[i] + " - " + result[i + 1]);
+    timeChunk.push({startTime: result[i], endTime: result[i + 1]});
   }
 
   return timeChunk;
@@ -39,8 +54,9 @@ const splitTime = (startTime, endTime, interval) => {
 // You change these values according to your needs
 
 // const interval = 60;
-// const startTime = new moment({ hour: 0, minute: 0 });
-// const endTime = new moment({ hour: 12, minute: 0 });
+// const startTime = new moment('6:00', 'HH:mm');
+// const endTime = new moment('8:00', 'HH:mm');
+// console.log(`${startTime} \n ${endTime}`);
 
 // const timeSlices = splitTime(startTime, endTime, interval);
 
@@ -52,4 +68,4 @@ const splitTime = (startTime, endTime, interval) => {
 //   console.log(timeSlices[i] + " - " + timeSlices[i + 1]);
 // }
 
-module.exports = { deleteAllAccountsByFieldID, splitTime };
+module.exports = { deleteAllAccountsByFieldID, splitTime, toTime, toDuration };

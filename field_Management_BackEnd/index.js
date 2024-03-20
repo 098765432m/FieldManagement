@@ -54,12 +54,8 @@ app.use((err,req,res,next) => {
 });
 
 // const moment = require('moment');
-// const st = moment('12:30', 'HH:mm');
-// const et = moment('23:30', 'HH:mm');
-// console.log(st.format('HH:mm'));
-// console.log(et.format('HH:mm'));
-// const isValid = st.isValid();
-// console.log(isValid);
+// const duration = moment.duration('1:30', ).asMinutes();
+// console.log(duration);
 
 
 module.exports = app;
