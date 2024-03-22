@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const address = new mongoose.Schema({
+    //duong
+    //phuong
+    //quan
     duong: {
         type: String, 
         required: true
@@ -18,6 +21,13 @@ const address = new mongoose.Schema({
 });
 
 const TimeSlotSchema = new mongoose.Schema({
+    //customerName
+    //startTime
+    //endTime
+    //childField
+    //schedule
+    //available
+
     customerName: {
         type: String,
     },
@@ -49,6 +59,10 @@ const TimeSlotSchema = new mongoose.Schema({
 });
 
 const ChildFieldSchema = new mongoose.Schema({
+    //name
+    //price
+    //field
+
     name: {
         type:String,
         required: true,
@@ -69,6 +83,10 @@ const ChildFieldSchema = new mongoose.Schema({
 
 
 const ScheduleSchema = new mongoose.Schema({
+    //date
+    //field
+    //timeSlot[]
+
     date: {
         type:String,
         required: true,
@@ -95,7 +113,7 @@ const fieldSchema = new mongoose.Schema({
     //startWorkAt
     //endWorkAt
     //ownerPhoneNumber
-    //childField
+    //childField[]
     //rating
     //Sport
 
@@ -138,11 +156,16 @@ const fieldSchema = new mongoose.Schema({
         }
     ],
 
-    rating: {
+    rating: [{
         type: Number,
         default: 0,
         min: [0, "Rating is too low, got {VALUE}"],
         max: [5, "Rating is too high, got {VALUE}"]
+    },],
+
+    averageRating: {
+        type: Number,
+        default: 0,
     },
 
     sport: {
@@ -156,7 +179,7 @@ const fieldSchema = new mongoose.Schema({
 const FieldAccountsSchema = mongoose.Schema({
     //field
     //owner
-    //staff
+    //staff[]
 
     field: {
         type: mongoose.Schema.Types.ObjectId,
@@ -179,6 +202,9 @@ const FieldAccountsSchema = mongoose.Schema({
 })
 
 const sportSchema = mongoose.Schema({
+    //sportName
+    //fields[]
+
     sportName: {
         type: String,
         required: true,
@@ -249,12 +275,16 @@ const customerSchema = mongoose.Schema({
         required: true,
     },
 
-    phoneNumber: {
-        type: String,
-    }
+    // phoneNumber: {
+    //     type: String,
+    // }
 });
 
 const RatingSchema = mongoose.Schema({
+    //rate
+    //comment
+    //customer
+    //field
     rate: {
         type: Number,
         required: true,

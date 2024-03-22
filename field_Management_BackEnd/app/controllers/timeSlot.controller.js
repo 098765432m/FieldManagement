@@ -134,7 +134,7 @@ const TimeSlotController = {
         }
     },
 
-    //Get TimeSlot by Id
+    //Get A TimeSlot by Id
     getATimeSlot: async (req,res) => {
         try {
           const id = req.params.id;
@@ -147,6 +147,36 @@ const TimeSlotController = {
         } catch (error) {
             const statusCode = error.statusCode || 500;
             return res.status(statusCode).json({error: error.message});
+        }
+    },
+
+    //Get TimeSlots by field and date and available = true
+    getAvailableTimeSlots: async (childField_ID, schedule_ID) => {
+        try {
+
+          // check childField is exist
+          const doc_ChildField = await ChildField.findById(childField_ID);
+          if(!doc_ChildField){
+            const err =  new Error(`ChildField with id = ${childField_ID} do not exist`);
+            err.statusCode = 400;
+            throw err;
+          }
+
+          // check Schedule is exist
+          const doc_Schedule = await Schedule.findById(schedule_ID);
+          if(!doc_Schedule){
+            const err =  new Error(`SChedule with id = ${schedule_ID} do not exist`);
+            err.statusCode = 400;
+            throw err;
+          }
+
+          return TimeSlot.find({childField: childField_ID, schedule: schedule_ID, available: true});
+          
+        } catch (err) {
+          const statusCode = err.statusCode || 500;
+          const error = new Error(err.message);
+          error.statusCode = statusCode;
+          throw error;
         }
     },
 
@@ -241,39 +271,6 @@ const TimeSlotController = {
       return res.status(statusCode).json({error: err.message});
     }
   },
-
-    //update a timeSlot by id
-  // updateATimeSlot: async (req, res) => {
-  //   try {
-      
-  //     const validationError = new TimeSlot(req.body).validateSync();
-  //       //check req.boy
-  //     if(validationError){
-  //       return res.status(400).json({ error: validationError.message});
-  //     }
-
-  //     //check date data is correct formar or valid
-  //     const timeString = req.body.date;
-  //     TimeSlotController.checkDateIsValid(timeString);
-
-  //     //get params id
-  //     const id = req.params.id;
-
-  //     const timeSlot = await TimeSlot.findById(id);
-
-  //     //Kiểm xem có tìm thấy timeSlot không
-  //     if(timeSlot){
-  //         await timeSlot.updateOne(req.body);
-  //         return res.status(200).json("Updated successfully");
-  //     } else {
-  //       return res.status(400).json({error: 'Khong tim thay lich voi id' + id})
-  //     }
-
-  //   } catch (err) {
-  //     const statusCode = err.statusCode || 500;
-  //     return res.status(statusCode).json({err: err.message});
-  //   }
-  // },
 
   
 }

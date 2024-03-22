@@ -34,8 +34,8 @@ app.use("/api/Field", fieldsRouter);
 app.use("/api/sports", sportsRouter);
 app.use("/api/FieldManager", fieldManagerRouter);
 app.use("/api/accounts", fieldAccountsRouter);
-app.use("/api/customers", customerRouter);
-app.use("/api/rating", ratingRouter);
+app.use("/api/Customer", customerRouter);
+app.use("/api/Rating", ratingRouter);
 
 app.use("/api/Schedule", scheduleRouter);
 app.use("/api/ChildField", childFieldRouter);

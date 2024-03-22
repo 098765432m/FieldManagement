@@ -1,36 +1,71 @@
+const ApiError = require("../api-error");
 const {Customer} = require("../model/model");
+const {ErrorHandler} = require("../utils/errorHandler.util");
 
 const CustomerController = {
-    addCustomer: async (req,res) => {
+
+    //add An customer
+    addCustomer: async (req, res) => {
         try{
+            
+            //Check req.body
+            const validationError = new Customer(req.body).validateSync();
+            if(validationError)
+                return res.status(400).json({error: validationError.message});
+
+            // check username has already use
+            const username = req.body.username;
+            await ErrorHandler.checkUsernameIsUsed(`username`, username, Customer);
+
             const newCustomer = new Customer(req.body);
             const savedCustomer = await newCustomer.save();
-            res.status(200).json(savedCustomer);
+
+            return res.status(200).json(savedCustomer);
         }catch(err){
-            res.status(500).json(err);
+            const statusCode = err.statusCode || 500
+            return res.status(statusCode).json(err.message);
         }
     },
 
-    getAllCustomers: async (req,res) => {
+    // Get All Customers 
+    getAllCustomers: async (req, res) => {
         try {
             const customers = await Customer.find();
-            res.status(200).json(customers);
+            return res.status(200).json(customers);
         } catch (err) {
-            res.status(500).json(err);
+            const statusCode = err.statusCode || 500
+            return res.status(statusCode).json(err.message);
         }
     },
 
+    // Return a Customer By ID
     getACustomer: async (req,res) => {
-        const customer = await Customer.findById(req.params.id);
-        res.status(200).json(customer);
+        try {
+            const id = req.params.id;
+            const customer = await Customer.findById(id);
+            if(!customer)
+                throw new ApiError(400, `Customer with id = ${id} has not been found`);
+
+            return res.status(200).json(customer);
+        } catch (err) {
+            const statusCode = err.statusCode || 500
+            return res.status(statusCode).json(err.message);
+        }
     },
 
+    // Remove A Customer By ID
     deleteACustomer: async (req,res) => {
         try {
-            await Customer.findByIdAndDelete(req.params.id);
-            res.status(200).json("Deleted a Customer");
+            const id = req.params.id;
+            const customer = await Customer.findById(id);
+            if(!customer)
+                throw new ApiError(400, `Customer with id = ${id} has not been found`);
+
+            await customer.deleteOne();
+            return res.status(200).json("Deleted a Customer");
         } catch (err) {
-            res.status(500).json(err);
+            const statusCode = err.statusCode || 500;
+            return res.status(statusCode).json(err.message);
         }
     }
 }

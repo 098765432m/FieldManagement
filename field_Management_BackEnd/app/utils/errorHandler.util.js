@@ -1,13 +1,13 @@
 const moment = require('moment');
 
+const ApiError = require("../api-error");
+
 const ErrorHandler = {
     //Function that check time (HH:mm)
     checkTimeIsValid : (timeString) => {
         const time = moment(timeString, "HH:mm");
         if(!time.isValid()){
-            const error = new Error(`Du lieu time: ${timeString} khong hop le - HH:mm`);
-            error.statusCode = 400;
-            throw error;
+            throw new ApiError(400, `Time data: ${timeString} is not valid - HH:mm`);
         }
     },
 
@@ -17,9 +17,7 @@ const ErrorHandler = {
     const et = moment(endTime, "HH:mm");
 
     if(st.isAfter(et)){
-        const error = new Error(`The startTime: ${startTime} is before the endTime: ${endTime}`);
-        error.statusCode = 400;
-        throw error;
+        throw new ApiError(400, `The startTime: ${startTime} is before the endTime: ${endTime}`);
     }
     },
 
@@ -27,11 +25,29 @@ const ErrorHandler = {
     checkDateIsValid : (dateString) => {
         const date = moment(dateString, "DD-MM-YYYY");
         if(!date.isValid()){
-            const error = new Error(`Du lieu date: ${dateString} khong hop le - DD-MM-YYYY`);
-            error.statusCode = 400;
-            throw error;
+            throw new ApiError(400, `Du lieu date: ${dateString} khong hop le - DD-MM-YYYY`);
         }
     },
+
+    //Function that check value has exist or no
+    checkUsernameIsUsed : async (fieldName ,username, Schema) => {
+        try {
+            //Use this instead cause you cant use Schema.find(fieldName: username) which your server look for field 'fieldName'
+            const query = {};
+            query[fieldName] = username;
+
+            const documents = await Schema.find(query);
+            
+            if (documents.length !== 0) {
+                const error = new ApiError(400, `${username} has been used. Please use another !`);
+                throw error;
+            }
+        } catch (err) {
+            const statusCode = err.statusCode || 500; 
+            const error =  new ApiError(statusCode, err.message);
+            throw error;
+        }
+    }
 }
 
 module.exports = {ErrorHandler}

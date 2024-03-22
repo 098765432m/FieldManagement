@@ -68,4 +68,13 @@ const splitTime = (startTime, endTime, interval) => {
 //   console.log(timeSlices[i] + " - " + timeSlices[i + 1]);
 // }
 
-module.exports = { deleteAllAccountsByFieldID, splitTime, toTime, toDuration };
+
+
+//Calculate Average
+function calculateAverage(ratings){
+  const total = ratings.reduce((acc, curr) => acc + curr, 0);
+  const roundedAverage = (total/ratings.length).toFixed(2);
+  return parseFloat(roundedAverage);
+}
+
+module.exports = { deleteAllAccountsByFieldID, splitTime, toTime, toDuration, calculateAverage };

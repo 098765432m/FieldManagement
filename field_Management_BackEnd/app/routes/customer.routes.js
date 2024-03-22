@@ -4,7 +4,7 @@ const { Customer } = require("../model/model");
 
 router.route("/")
     //Lấy tất cả khách hàng
-    .get(CustomerController.getAllCustomers)
+    // .get(CustomerController.getAllCustomers)
     //Thêm 1 Customer
     .post(CustomerController.addCustomer)
 
